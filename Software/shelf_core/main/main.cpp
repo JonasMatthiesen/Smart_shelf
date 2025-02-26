@@ -15,11 +15,15 @@
 #include "esp_flash.h"
 #include "esp_system.h"
 
-extern "C"
+
+extern "C" void app_main(void)
 {
-    void app_main(void)
+    printf("Program start\n");
+    xTaskCreatePinnedToCore(statemachine_task, "State Task", 4096, (void*)0, 1, NULL, tskNO_AFFINITY);
+
+    while(1)
     {
-        printf("Hello world!\n");
-        xTaskCreatePinnedToCore(state_start, "State Task", 4096, (void*)0, 1, NULL, tskNO_AFFINITY);
+        //printf("Main loop\n");
+        vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
