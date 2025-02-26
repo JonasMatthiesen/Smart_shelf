@@ -1,0 +1,13 @@
+# Target labels
+ bootloader
+# Source files and their labels
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/CMakeFiles/bootloader
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/CMakeFiles/bootloader.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/CMakeFiles/bootloader-complete.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/bootloader-prefix/src/bootloader-stamp/bootloader-build.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/bootloader-prefix/src/bootloader-stamp/bootloader-configure.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/bootloader-prefix/src/bootloader-stamp/bootloader-download.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/bootloader-prefix/src/bootloader-stamp/bootloader-install.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/bootloader-prefix/src/bootloader-stamp/bootloader-mkdir.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/bootloader-prefix/src/bootloader-stamp/bootloader-patch.rule
+E:/DTU_GIT/Smart_shelf/Software/shelf_core/build/bootloader-prefix/src/bootloader-stamp/bootloader-update.rule
