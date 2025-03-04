@@ -31,5 +31,5 @@ void shelf_start()
 
 void shelf_loop()
 {
-    printf("Shelf loop\n");
+   // printf("Shelf loop\n");
 }

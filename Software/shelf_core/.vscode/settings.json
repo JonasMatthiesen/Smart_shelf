@@ -3,5 +3,10 @@
     "idf.espIdfPathWin": "C:\\Users\\Dillerdoller\\esp\\v5.4\\esp-idf",
     "idf.toolsPathWin": "C:\\Users\\Dillerdoller\\.espressif",
     "idf.pythonInstallPath": "C:\\Users\\Dillerdoller\\.espressif\\tools\\idf-python\\3.11.2\\python.exe",
-    "idf.portWin": "COM5"
+    "idf.portWin": "COM5",
+    "files.associations": {
+        "complex": "cpp",
+        "format": "cpp"
+    },
+    "idf.flashType": "UART"
 }
