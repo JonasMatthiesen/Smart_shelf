@@ -32,5 +32,5 @@ void message_start()
 
 void message_loop()
 {
-    printf("Message loop\n");
+
 }

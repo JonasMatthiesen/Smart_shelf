@@ -39,7 +39,7 @@ void statemachine_start()
 
 void statemachine_loop()
 {
-    printf("Statemachine loop\n");
+
 }
 
 
