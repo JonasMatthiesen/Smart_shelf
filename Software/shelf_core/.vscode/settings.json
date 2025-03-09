@@ -6,7 +6,8 @@
     "idf.portWin": "COM5",
     "files.associations": {
         "complex": "cpp",
-        "format": "cpp"
+        "format": "cpp",
+        "system_error": "cpp"
     },
     "idf.flashType": "UART"
 }

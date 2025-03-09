@@ -30,10 +30,11 @@ static const char* TAG = "MESSAGE_CONTROLLER";
 uint8_t wifi_connect_retries = 0;
 bool ses_present = 0;
 TaskHandle_t mqtt_task_handle; //mqtt task
- const char* topic = "sensor/reading";
+ const char* topic_pub = "sensor/reading";
+ const char* topic_sub = "/read";
  const char* thing_name = "aws_esp";
  const char* user_name = "user";
-const char* endpoint = "a36cpyo54toisq-ats.iot.eu-north-1.amazonaws.com";
+const char* endpoint = "a36cpyo54toisq-ats.iot.eu-west-1.amazonaws.com";
 bool mqtt_connected = false;
 uint8_t buffer[1024];
 NetworkContext_t network_context;
@@ -43,6 +44,21 @@ MQTTFixedBuffer_t network_buffer;
 MQTTPublishInfo_t publish_info;
 MQTTContext_t mqtt_context;
 QueueHandle_t mqtt_aws_queue;
+
+struct Shelf {
+    int shelf_id;
+    std::string name;
+    double weight;
+    double weight_of_one_item;
+    int items;
+    int limit;
+};
+
+Shelf shelf_1 = {1, "shelf_1_name", 0, 0, 0, 100};
+Shelf shelf_2 = {2, "shelf_2_name", 0, 0, 0, 100};
+Shelf shelf_3 = {3, "shelf_3_name", 0, 0, 0, 100};
+
+using json = nlohmann::json;
 
 extern  "C"
 {
@@ -141,13 +157,14 @@ static void softap_prov_init(void)
 }
 static void mqtt_event_cb(MQTTContext_t* pMQTTContext,MQTTPacketInfo_t* pPacketInfo, MQTTDeserializedInfo_t* pDeserializedInfo)
 {
+    ESP_LOGI(TAG,"MQTT CALL BACK EVENT: Packet info: %d", pPacketInfo->type);
    switch(pPacketInfo->type)
    {
-      case MQTT_PACKET_TYPE_PUBLISH : //Message received
+    case MQTT_PACKET_TYPE_PUBLISH : //Message received
         ESP_LOGI(TAG,"MQTT_PACKET_TYPE_PUBLISH");
         ESP_LOGI(TAG,"received :\n%s",(const char*)(pDeserializedInfo->pPublishInfo->pPayload));        
         break;
-     case MQTT_PACKET_TYPE_SUBSCRIBE :
+    case MQTT_PACKET_TYPE_SUBSCRIBE :
         ESP_LOGI(TAG,"MQTT_PACKET_TYPE_SUBSCRIBE");
         break;
     case MQTT_PACKET_TYPE_CONNECT  :
@@ -167,7 +184,8 @@ void mqtt_process_task()
     if (!mqtt_task_started)
     {
         ESP_LOGI(TAG,"mqtt_process_task started");
-        mqtt_subscribe_to(&mqtt_context,topic,MQTTQoS0);
+        mqtt_subscribe_to(&mqtt_context,topic_pub,MQTTQoS0);
+        mqtt_subscribe_to(&mqtt_context,topic_sub,MQTTQoS0);
         mqtt_task_started = true;
     }
 
@@ -175,15 +193,38 @@ void mqtt_process_task()
     {
         MQTT_ProcessLoop(&mqtt_context);
         std::stringstream ss_mqtt;
-        // ESP_LOGI(TAG,"t: %f",sensor_readings[0]);
-        // ESP_LOGI(TAG,"p: %f",sensor_readings[1]);
-        // ESP_LOGI(TAG,"h: %f",sensor_readings[2]);
+
+        json message_json = {
+            {"smart_shelf_id", "smart_shelf_1"},
+            {"shelves", {
+                {
+                    {"shelf_id", shelf_1.shelf_id},
+                    {"name", shelf_1.name},
+                    {"weight", shelf_1.weight},
+                    {"weight_of_one_item", shelf_1.weight_of_one_item},
+                    {"items", shelf_1.items},
+                    {"limit", shelf_1.limit}
+                },
+                {
+                    {"shelf_id", shelf_2.shelf_id},
+                    {"name", shelf_2.name},
+                    {"weight", shelf_2.weight},
+                    {"weight_of_one_item", shelf_2.weight_of_one_item},
+                    {"items", shelf_2.items},
+                    {"limit", shelf_2.limit}
+                },
+                {
+                    {"shelf_id", shelf_3.shelf_id},
+                    {"name", shelf_3.name},
+                    {"weight", shelf_3.weight},
+                    {"weight_of_one_item", shelf_3.weight_of_one_item},
+                    {"items", shelf_3.items},
+                    {"limit", shelf_3.limit}
+                }
+            }}
+        };
         
-        ss_mqtt << "{\"temperature\":" << 0 
-        << ",\"pressure\":"    << 0 
-        << ",\"humidity\":"    << 0 << "}";
-        
-        std::string mqtt_string = ss_mqtt.str();
+        std::string mqtt_string = message_json.dump();
         publish_info.pPayload = mqtt_string.c_str();
         publish_info.payloadLength = mqtt_string.length();
         uint16_t packet_id = MQTT_GetPacketId(&mqtt_context);
@@ -296,8 +337,8 @@ void aws_init(void)
     connect_info.pUserName = user_name;
     connect_info.userNameLength = ( uint16_t ) strlen(user_name);
     publish_info.qos = MQTTQoS0;
-    publish_info.pTopicName = topic;
-    publish_info.topicNameLength = strlen(topic);
+    publish_info.pTopicName = topic_pub;
+    publish_info.topicNameLength = strlen(topic_pub);
     MQTT_Init(&mqtt_context,&transport,Clock_GetTimeMs,&mqtt_event_cb,&network_buffer);
 }
 

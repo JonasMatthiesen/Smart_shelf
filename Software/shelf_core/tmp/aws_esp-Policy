@@ -9,9 +9,9 @@
         "iot:PublishRetain"
       ],
       "Resource": [
-        "arn:aws:iot:eu-north-1:060795938731:topic/sdk/test/java",
-        "arn:aws:iot:eu-north-1:060795938731:topic/sdk/test/python",
-        "arn:aws:iot:eu-north-1:060795938731:topic/sdk/test/js"
+        "arn:aws:iot:eu-west-1:060795938731:topic/sdk/test/java",
+        "arn:aws:iot:eu-west-1:060795938731:topic/sdk/test/python",
+        "arn:aws:iot:eu-west-1:060795938731:topic/sdk/test/js"
       ]
     },
     {
@@ -20,9 +20,9 @@
         "iot:Subscribe"
       ],
       "Resource": [
-        "arn:aws:iot:eu-north-1:060795938731:topicfilter/sdk/test/java",
-        "arn:aws:iot:eu-north-1:060795938731:topicfilter/sdk/test/python",
-        "arn:aws:iot:eu-north-1:060795938731:topicfilter/sdk/test/js"
+        "arn:aws:iot:eu-west-1:060795938731:topicfilter/sdk/test/java",
+        "arn:aws:iot:eu-west-1:060795938731:topicfilter/sdk/test/python",
+        "arn:aws:iot:eu-west-1:060795938731:topicfilter/sdk/test/js"
       ]
     },
     {
@@ -31,9 +31,9 @@
         "iot:Connect"
       ],
       "Resource": [
-        "arn:aws:iot:eu-north-1:060795938731:client/sdk-java",
-        "arn:aws:iot:eu-north-1:060795938731:client/basicPubSub",
-        "arn:aws:iot:eu-north-1:060795938731:client/sdk-nodejs-*"
+        "arn:aws:iot:eu-west-1:060795938731:client/sdk-java",
+        "arn:aws:iot:eu-west-1:060795938731:client/basicPubSub",
+        "arn:aws:iot:eu-west-1:060795938731:client/sdk-nodejs-*"
       ]
     }
   ]
