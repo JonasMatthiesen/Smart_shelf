@@ -296,6 +296,14 @@ void Display::set_active_shelf(ActiveShelf shelf)
         lv_obj_set_style_bg_color(ui_TextArea2, lv_color_make(0x3f, 0x3f, 0x3f), 0);
         lv_obj_set_style_text_color(ui_TextArea2, lv_color_make(0xff, 0xff, 0xff), 0);
     }
+    else if (shelf == ActiveShelf::NONE)
+    {
+        lv_obj_set_style_bg_color(ui_TextArea1, lv_color_make(0xd3, 0xd3, 0xd3), 0);
+        lv_obj_set_style_text_color(ui_TextArea1, lv_color_make(0x00, 0x00, 0x00), 0);
+
+        lv_obj_set_style_bg_color(ui_TextArea2, lv_color_make(0xd3, 0xd3, 0xd3), 0);
+        lv_obj_set_style_text_color(ui_TextArea2, lv_color_make(0x00, 0x00, 0x00), 0);
+    }
     _lock_release(&lvgl_api_lock);
 
 }

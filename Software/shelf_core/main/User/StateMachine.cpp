@@ -34,7 +34,7 @@ void statemachine_start()
 {
     printf("Statemachine start\n");
     xTaskCreatePinnedToCore(message_task, "Message Task", 4096, (void*)2, TASK_PRIO_2, NULL, tskNO_AFFINITY);
-    xTaskCreatePinnedToCore(shelf_task, "State Task", 4096, (void*)3, TASK_PRIO_3, NULL, tskNO_AFFINITY);
+    xTaskCreatePinnedToCore(shelf_task, "Shelf Task", 4096, (void*)3, TASK_PRIO_3, NULL, tskNO_AFFINITY);
 }
 
 void statemachine_loop()

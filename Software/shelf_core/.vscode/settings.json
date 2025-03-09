@@ -6,6 +6,12 @@
     "idf.portWin": "COM4",
     "idf.flashType": "UART",
     "files.associations": {
-        "ui.h": "c"
+        "ui.h": "c",
+        "array": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "ranges": "cpp",
+        "span": "cpp",
+        "chrono": "cpp"
     }
 }
