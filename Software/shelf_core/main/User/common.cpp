@@ -2,7 +2,7 @@
 #include "esp_log.h"
 
 ShelfData data;
-bool mqtt_connected = false;
+bool server_connected = false;
 bool init_complete = false;
 bool shelf_data_initialized = false;
 bool shelf_data_updated = false;
@@ -30,12 +30,12 @@ void Common::set_connected(bool connected)
     //     ESP_LOGE("Common", "Connected can only be set by the message controller task");
     // }
 
-    mqtt_connected = connected;
+    server_connected = connected;
 }
 
 bool Common::get_connected()
 {
-    return mqtt_connected;
+    return server_connected;
 }
 
 void Common::set_init_complete(bool complete)

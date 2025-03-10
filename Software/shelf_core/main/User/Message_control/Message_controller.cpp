@@ -21,6 +21,7 @@
 #include "wifi_provisioning/manager.h"
 #include "wifi_provisioning/scheme_softap.h"
 #include "json.hpp"
+#include "../common.h"
 
 #define WIFI_CONNECT_RETRIES (3)
 
@@ -364,7 +365,7 @@ void message_loop()
 }
 
 ShelfData sdata;
-
+bool sent = false;
 #include "esp_timer.h"
 
 inline uint32_t millis()
