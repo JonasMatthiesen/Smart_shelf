@@ -2,9 +2,11 @@
 #include "esp_log.h"
 
 ShelfData data;
-bool server_connected = false;
+bool server_connected = true;
+bool wifi_connected = true;
+bool wifi_provisioned = true;
 bool init_complete = false;
-bool shelf_data_initialized = false;
+bool shelf_data_initialized = true;
 bool shelf_data_updated = false;
 
 void Common::set_shelf_data(ShelfData _data)
@@ -14,6 +16,27 @@ void Common::set_shelf_data(ShelfData _data)
 
 ShelfData Common::get_shelf_data()
 {
+    float weight_scaler = 0.095;
+    int32_t weight_offset = 8600;
+    data.calib_scalar = 0;
+    data.calib_offset = 0;
+
+    data.s1_mpn = "Screw";
+    data.s1_qty = 50;
+    data.s1_weight_per_item = 100;
+    data.s1_qty_limit = 100;
+
+    data.s2_mpn = "Bolt";
+    data.s2_qty = 55;
+    data.s2_weight_per_item = 50;
+    data.s2_qty_limit = 100;
+
+    data.s3_mpn = "Nail";
+    data.s3_qty = 120;
+    data.s3_weight_per_item = 20;
+    data.s3_qty_limit = 100;
+
+    data.total_weight = 0;
     return data;
 }
 
@@ -88,3 +111,38 @@ bool Common::get_shelf_data_updated()
 {
     return shelf_data_updated;
 }
+
+bool Common::get_wifi_connected()
+{
+    return wifi_connected;
+}
+
+void Common::set_wifi_connected(bool connected)
+{
+    //Must only be set by the shelf controller task
+    // TaskHandle_t xTaskGetCurrentTaskHandle();
+    // if (xTaskGetCurrentTaskHandle() == xTaskGetHandle("Shelf Task"))
+    // {
+    //     shelf_data_updated = data_updated;
+    // }
+
+    wifi_connected = connected;
+}
+
+bool Common::get_wifi_provisioned()
+{
+    return wifi_provisioned;
+}
+
+void Common::set_wifi_provisioned(bool connected)
+{
+    //Must only be set by the shelf controller task
+    // TaskHandle_t xTaskGetCurrentTaskHandle();
+    // if (xTaskGetCurrentTaskHandle() == xTaskGetHandle("Shelf Task"))
+    // {
+    //     shelf_data_updated = data_updated;
+    // }
+
+    wifi_provisioned = connected;
+}
+

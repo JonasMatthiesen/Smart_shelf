@@ -412,12 +412,12 @@ void message_task(void *arg)
         sdata.calib_scalar = weight_scaler;
         sdata.calib_offset = weight_offset;
         sdata.s1_mpn = "Screw";
-        sdata.s1_qty = "22";
+        sdata.s1_qty = 22;
         sdata.s1_weight_per_item = 50;
         sdata.s1_qty_limit = 100;
     
         sdata.s2_mpn = "Bolt";
-        sdata.s2_qty = "55";
+        sdata.s2_qty = 55;
         sdata.s2_weight_per_item = 100;
         sdata.s2_qty_limit = 100;
 

@@ -18,6 +18,7 @@ lv_obj_t * ui_Label2;
 lv_obj_t * ui_Screen2;
 lv_obj_t * ui_TextArea1;
 lv_obj_t * ui_TextArea2;
+lv_obj_t * ui_TextArea3;
 // CUSTOM VARIABLES
 
 // EVENTS

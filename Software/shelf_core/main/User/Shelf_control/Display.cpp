@@ -296,6 +296,15 @@ void Display::set_active_shelf(ActiveShelf shelf)
         lv_obj_set_style_bg_color(ui_TextArea2, lv_color_make(0x3f, 0x3f, 0x3f), 0);
         lv_obj_set_style_text_color(ui_TextArea2, lv_color_make(0xff, 0xff, 0xff), 0);
     }
+    else if (shelf == ActiveShelf::SHELF_3)
+    {
+        ESP_LOGI(TAG, "Shelf 3 active");
+        lv_obj_set_style_bg_color(ui_TextArea3, lv_color_make(0xd3, 0xd3, 0xd3), 0);
+        lv_obj_set_style_text_color(ui_TextArea3, lv_color_make(0x00, 0x00, 0x00), 0);
+
+        lv_obj_set_style_bg_color(ui_TextArea3, lv_color_make(0x3f, 0x3f, 0x3f), 0);
+        lv_obj_set_style_text_color(ui_TextArea3, lv_color_make(0xff, 0xff, 0xff), 0);
+    }
     else if (shelf == ActiveShelf::NONE)
     {
         lv_obj_set_style_bg_color(ui_TextArea1, lv_color_make(0xd3, 0xd3, 0xd3), 0);
@@ -303,26 +312,49 @@ void Display::set_active_shelf(ActiveShelf shelf)
 
         lv_obj_set_style_bg_color(ui_TextArea2, lv_color_make(0xd3, 0xd3, 0xd3), 0);
         lv_obj_set_style_text_color(ui_TextArea2, lv_color_make(0x00, 0x00, 0x00), 0);
+
+        lv_obj_set_style_bg_color(ui_TextArea3, lv_color_make(0xd3, 0xd3, 0xd3), 0);
+        lv_obj_set_style_text_color(ui_TextArea3, lv_color_make(0x00, 0x00, 0x00), 0);
     }
     _lock_release(&lvgl_api_lock);
 
 }
 
-void Display::set_shelf_data(ActiveShelf shelf, const char *mpn, const char *qty)
+void Display::set_shelf_data(ActiveShelf shelf, const char *mpn, float qty)
 {
     _lock_acquire(&lvgl_api_lock);
     char tmp[128];
     if (shelf == ActiveShelf::SHELF_1)
     {
         ESP_LOGI(TAG, "Shelf 1 data set");
-	    snprintf(tmp, sizeof(tmp), "			                      Shelf 1:\n\n			         MPN: %s\n\n			        QTY:%s", mpn, qty);
+	    snprintf(tmp, sizeof(tmp), "			                      Shelf 1:\n			         MPN: %s\n			         QTY:%.0f", mpn, qty);
         lv_textarea_set_text(ui_TextArea1, tmp);
     }
     else if (shelf == ActiveShelf::SHELF_2)
     {
         ESP_LOGI(TAG, "Shelf 2 data set");
-	    snprintf(tmp, sizeof(tmp), "			                      Shelf 2:\n\n			         MPN: %s\n\n			        QTY:%s", mpn, qty);
+	    snprintf(tmp, sizeof(tmp), "			                      Shelf 2:\n			         MPN: %s\n			         QTY:%.0f", mpn, qty);
         lv_textarea_set_text(ui_TextArea2, tmp);
     }
+    else if (shelf == ActiveShelf::SHELF_3)
+    {
+        ESP_LOGI(TAG, "Shelf 3 data set");
+	    snprintf(tmp, sizeof(tmp), "			                      Shelf 3:\n			         MPN: %s\n			         QTY:%.0f", mpn, qty);
+        lv_textarea_set_text(ui_TextArea3, tmp);
+    }
+    _lock_release(&lvgl_api_lock);
+}
+
+void Display::set_bootup_message(const char *message)
+{
+    _lock_acquire(&lvgl_api_lock);
+    lv_label_set_text(ui_Label2, message);
+    _lock_release(&lvgl_api_lock);
+}
+
+void Display::set_bootup_title(const char *message)
+{
+    _lock_acquire(&lvgl_api_lock);
+    lv_label_set_text(ui_Label1, message);
     _lock_release(&lvgl_api_lock);
 }
