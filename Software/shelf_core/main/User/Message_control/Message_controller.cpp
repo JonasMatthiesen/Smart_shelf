@@ -33,9 +33,9 @@ bool ses_present = 0;
 TaskHandle_t mqtt_task_handle; //mqtt task
  const char* topic_pub = "sensor/reading";
  const char* topic_sub = "/read";
- const char* thing_name = "aws_esp";
+ const char* thing_name = "smart_shelf_1_windows";
  const char* user_name = "user";
-const char* endpoint = "a36cpyo54toisq-ats.iot.eu-west-1.amazonaws.com";
+const char* endpoint = "a2hfupbrus69r5-ats.iot.eu-west-1.amazonaws.com";
 bool mqtt_connected = false;
 uint8_t buffer[1024];
 NetworkContext_t network_context;
