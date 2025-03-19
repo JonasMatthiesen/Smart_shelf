@@ -15,23 +15,33 @@ void main_screen_init()
 
     ui_TextArea1 = lv_textarea_create(ui_Screen2);
     lv_obj_set_width(ui_TextArea1, 245);
-    lv_obj_set_height(ui_TextArea1, 118);
-    lv_obj_set_x(ui_TextArea1, -2);
-    lv_obj_set_y(ui_TextArea1, -63);
+    lv_obj_set_height(ui_TextArea1, 80);
+    lv_obj_set_x(ui_TextArea1, 0);
+    lv_obj_set_y(ui_TextArea1, -80);
     lv_obj_set_align(ui_TextArea1, LV_ALIGN_CENTER);
-    lv_textarea_set_text(ui_TextArea1, "			                      Shelf 1:\n\n			         MPN:\n\n			        QTY:");
+    lv_textarea_set_text(ui_TextArea1, "			                      Shelf 1:\n			         MPN:\n			        QTY:");
     lv_textarea_set_placeholder_text(ui_TextArea1, "Placeholder...");
     lv_obj_set_style_bg_color(ui_TextArea1, lv_color_make(0xd3, 0xd3, 0xd3), 0);
 
     ui_TextArea2 = lv_textarea_create(ui_Screen2);
     lv_obj_set_width(ui_TextArea2, 245);
-    lv_obj_set_height(ui_TextArea2, 118);
-    lv_obj_set_x(ui_TextArea2, 1);
-    lv_obj_set_y(ui_TextArea2, 63);
+    lv_obj_set_height(ui_TextArea2, 80);
+    lv_obj_set_x(ui_TextArea2, 0);
+    lv_obj_set_y(ui_TextArea2, 0);
     lv_obj_set_align(ui_TextArea2, LV_ALIGN_CENTER);
-    lv_textarea_set_text(ui_TextArea2, "			                      Shelf 2:\n\n			         MPN:\n\n			        QTY:");
+    lv_textarea_set_text(ui_TextArea2, "			                      Shelf 2:\n			         MPN:\n			         QTY:");
     lv_textarea_set_placeholder_text(ui_TextArea2, "Placeholder...");
     lv_obj_set_style_bg_color(ui_TextArea2, lv_color_make(0xd3, 0xd3, 0xd3), 0);
+
+    ui_TextArea3 = lv_textarea_create(ui_Screen2);
+    lv_obj_set_width(ui_TextArea3, 245);
+    lv_obj_set_height(ui_TextArea3, 80);
+    lv_obj_set_x(ui_TextArea3, 0);
+    lv_obj_set_y(ui_TextArea3, 80);
+    lv_obj_set_align(ui_TextArea3, LV_ALIGN_CENTER);
+    lv_textarea_set_text(ui_TextArea3, "			                      Shelf 3:\n			         MPN:\n			         QTY:");
+    lv_textarea_set_placeholder_text(ui_TextArea3, "Placeholder...");
+    lv_obj_set_style_bg_color(ui_TextArea3, lv_color_make(0xd3, 0xd3, 0xd3), 0);
 
     //lv_obj_set_style_bg_color(ui_TextArea2, lv_color_make(0x3f, 0x3f, 0x3f), 0);
     //lv_obj_set_style_text_color(ui_TextArea2, lv_color_make(0xff, 0xff, 0xff), 0);

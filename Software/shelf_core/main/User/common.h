@@ -1,5 +1,7 @@
 #include <stdint.h>
 
+const bool SHELF_CONTROL_DEBUG_MODE = false;
+
 enum class ShelfCommands
 {
     NONE = 0,
@@ -11,14 +13,19 @@ enum class ShelfCommands
 struct ShelfData
 {
     char * s1_mpn;
-    int s1_qty;
+    float s1_qty;
     float s1_weight_per_item;
     int s1_qty_limit;
 
     char * s2_mpn;
-    int s2_qty;
+    float s2_qty;
     float s2_weight_per_item;
     int s2_qty_limit;
+
+    char * s3_mpn;
+    float s3_qty;
+    float s3_weight_per_item;
+    int s3_qty_limit;
 
     float calib_scalar;
     int32_t calib_offset;
@@ -48,5 +55,11 @@ namespace Common
     //Is set from shelf controller when data is updated - Used as notify from shelf controller to message controller when new data is available
     void set_shelf_data_updated(bool data_updated);
     bool get_shelf_data_updated();
+
+    bool get_wifi_connected();
+    void set_wifi_connected(bool connected);
+
+    bool get_wifi_provisioned();
+    void set_wifi_provisioned(bool connected);
 }
 

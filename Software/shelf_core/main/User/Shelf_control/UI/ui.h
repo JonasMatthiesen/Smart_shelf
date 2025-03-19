@@ -36,6 +36,7 @@ void main_screen_init();
 extern lv_obj_t * ui_Screen2;
 extern lv_obj_t * ui_TextArea1;
 extern lv_obj_t * ui_TextArea2;
+extern lv_obj_t * ui_TextArea3;
 // CUSTOM VARIABLES
 
 // EVENTS
