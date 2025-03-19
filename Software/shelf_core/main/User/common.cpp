@@ -16,22 +16,22 @@ void Common::set_shelf_data(ShelfData _data)
 
 ShelfData Common::get_shelf_data()
 {
-    float weight_scaler = 0.095;
-    int32_t weight_offset = 8600;
-    data.calib_scalar = 0;
-    data.calib_offset = 0;
+    float weight_scaler = 0.10025;
+    int32_t weight_offset = -3649;
+    data.calib_scalar = weight_scaler;
+    data.calib_offset = weight_offset;
 
-    data.s1_mpn = "Screw";
-    data.s1_qty = 50;
-    data.s1_weight_per_item = 100;
+    data.s1_mpn = "Screw big";
+    data.s1_qty = 0;
+    data.s1_weight_per_item = 26;
     data.s1_qty_limit = 100;
 
-    data.s2_mpn = "Bolt";
-    data.s2_qty = 55;
-    data.s2_weight_per_item = 50;
+    data.s2_mpn = "Screw small";
+    data.s2_qty = 0;
+    data.s2_weight_per_item = 13;
     data.s2_qty_limit = 100;
 
-    data.s3_mpn = "Nail";
+    data.s3_mpn = "Bolt";
     data.s3_qty = 120;
     data.s3_weight_per_item = 20;
     data.s3_qty_limit = 100;

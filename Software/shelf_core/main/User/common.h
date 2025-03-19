@@ -1,6 +1,6 @@
 #include <stdint.h>
 
-const bool SHELF_CONTROL_DEBUG_MODE = true;
+const bool SHELF_CONTROL_DEBUG_MODE = false;
 
 enum class ShelfCommands
 {

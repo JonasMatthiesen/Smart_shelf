@@ -21,9 +21,9 @@ uint32_t last_time = 0;
 
 gpio_num_t SHELF1_HALL_PIN = GPIO_NUM_26;
 gpio_num_t SHELF2_HALL_PIN = GPIO_NUM_27;
-gpio_num_t SHELF3_HALL_PIN = GPIO_NUM_25; //Is actually 32, but weigth sensor is on 32 on breadboard
+gpio_num_t SHELF3_HALL_PIN = GPIO_NUM_32;
 
-gpio_num_t HX711_SCK_PIN = GPIO_NUM_32; //Should be moved to 33 with botch
+gpio_num_t HX711_SCK_PIN = GPIO_NUM_33;
 gpio_num_t HX711_DOUT_PIN = GPIO_NUM_35;
 
 ShelfData shelf_data;
@@ -115,10 +115,10 @@ float get_current_weight()
         ESP_LOGE(TAG, "Could not read data: %d (%s)\n", r, esp_err_to_name(r));
     }
 
-    ESP_LOGI(TAG, "Raw weight: %li \n", data);
+    //ESP_LOGI(TAG, "Raw weight: %li \n", data);
     float weight = (data-shelf_data.calib_offset)*shelf_data.calib_scalar;
-    ESP_LOGI(TAG, "Scaled weight: %f \n", weight);
-    return weight;
+    //ESP_LOGI(TAG, "Scaled weight: %f \n", weight);
+    return weight*(-1);
 }
 
 //This function checks if the wifi is provisioned, and if the message controller is connected to AWS. It will wait CONNECTION_TIMEOUT time for each check
@@ -222,13 +222,16 @@ void shelf_start()
     gpio_set_direction(SHELF1_HALL_PIN, GPIO_MODE_INPUT);
     gpio_set_direction(SHELF2_HALL_PIN, GPIO_MODE_INPUT);
     gpio_set_direction(SHELF3_HALL_PIN, GPIO_MODE_INPUT);
-    
+
     Display::start();
     Display::load_splash_screen();
     // initialize device
     ESP_ERROR_CHECK(hx711_init(&hx711));
 
-    startup_checks_and_wait();
+    if (!SHELF_CONTROL_DEBUG_MODE)
+    {
+        startup_checks_and_wait();
+    }
     
     shelf_data = Common::get_shelf_data();
 
@@ -291,6 +294,7 @@ void shelf_loop()
         }
 
         float new_weight = get_current_weight();
+        ESP_LOGI(TAG, "Weight: %f" PRIi32, new_weight);
     }
     else if (Common::get_init_complete())
     {
@@ -317,9 +321,9 @@ void shelf_loop()
             float new_qty = weight_diff / shelf_data.s1_weight_per_item;
 
             ESP_LOGI(TAG, "Weight diff: %f" PRIi32, weight_diff);
-            ESP_LOGI(TAG, "New qty: %f" PRIi32, floor(new_qty));
+            ESP_LOGI(TAG, "New qty: %f" PRIi32, round(new_qty));
 
-            shelf_data.s1_qty += floor(new_qty);
+            shelf_data.s1_qty += round(new_qty);
             shelf_data.total_weight = new_weight;
             
             Display::set_shelf_data(Display::ActiveShelf::SHELF_1, shelf_data.s1_mpn, shelf_data.s1_qty);
@@ -347,9 +351,9 @@ void shelf_loop()
                 float new_qty = weight_diff / shelf_data.s2_weight_per_item;
     
                 ESP_LOGI(TAG, "Weight diff: %f" PRIi32, weight_diff);
-                ESP_LOGI(TAG, "New qty: %f" PRIi32, floor(new_qty));
+                ESP_LOGI(TAG, "New qty: %f" PRIi32, round(new_qty));
     
-                shelf_data.s2_qty += floor(new_qty);
+                shelf_data.s2_qty += round(new_qty);
                 shelf_data.total_weight = new_weight;
                 
                 Display::set_shelf_data(Display::ActiveShelf::SHELF_2, shelf_data.s2_mpn, shelf_data.s2_qty);
@@ -377,9 +381,9 @@ void shelf_loop()
             float new_qty = weight_diff / shelf_data.s3_weight_per_item;
 
             ESP_LOGI(TAG, "Weight diff: %f" PRIi32, weight_diff);
-            ESP_LOGI(TAG, "New qty: %f" PRIi32, floor(new_qty));
+            ESP_LOGI(TAG, "New qty: %f" PRIi32, round(new_qty));
 
-            shelf_data.s3_qty += floor(new_qty);
+            shelf_data.s3_qty += round(new_qty);
             shelf_data.total_weight = new_weight;
             
             Display::set_shelf_data(Display::ActiveShelf::SHELF_3, shelf_data.s3_mpn, shelf_data.s3_qty);
