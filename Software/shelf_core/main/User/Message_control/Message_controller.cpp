@@ -30,34 +30,21 @@ const uint16_t MESSAGE_LOOP_TIME_MS = 1000;
 static const char* TAG = "MESSAGE_CONTROLLER";
 uint8_t wifi_connect_retries = 0;
 bool ses_present = 0;
+bool connect_message = false;
 TaskHandle_t mqtt_task_handle; //mqtt task
  const char* topic_pub = "sensor/reading";
  const char* topic_sub = "/read";
  const char* thing_name = "smart_shelf_1_windows";
  const char* user_name = "user";
 const char* endpoint = "a2hfupbrus69r5-ats.iot.eu-west-1.amazonaws.com";
-bool mqtt_connected = false;
 uint8_t buffer[1024];
 NetworkContext_t network_context;
 TransportInterface_t transport;
 MQTTConnectInfo_t connect_info;
-MQTTFixedBuffer_t network_buffer;
+MQTTFixedBuffer_t network_buffer; 
 MQTTPublishInfo_t publish_info;
 MQTTContext_t mqtt_context;
 QueueHandle_t mqtt_aws_queue;
-
-struct Shelf {
-    int shelf_id;
-    std::string name;
-    double weight;
-    double weight_of_one_item;
-    int items;
-    int limit;
-};
-
-Shelf shelf_1 = {1, "shelf_1_name", 0, 0, 0, 100};
-Shelf shelf_2 = {2, "shelf_2_name", 0, 0, 0, 100};
-Shelf shelf_3 = {3, "shelf_3_name", 0, 0, 0, 100};
 
 using json = nlohmann::json;
 
@@ -144,7 +131,7 @@ static void softap_prov_init(void)
         wifi_prov_mgr_deinit();
         esp_wifi_set_mode(WIFI_MODE_STA);
         esp_wifi_start();
-      
+        Common::set_wifi_provisioned(true);  
     }
     else
     {
@@ -153,9 +140,45 @@ static void softap_prov_init(void)
         wifi_prov_mgr_disable_auto_stop(1000);
         wifi_prov_mgr_start_provisioning(WIFI_PROV_SECURITY_0,NULL,"PROV_ESP","password");
         print_qr_code();
-
     }
 }
+
+void mqtt_decode_recieved(const json* mqtt_package)
+{
+    ShelfData sdata;
+
+    float weight_scaler = 0.095;
+    int32_t weight_offset = 8600;
+    sdata.calib_scalar = mqtt_package->value("calibrate_scalar", 0.0);
+    sdata.calib_offset = mqtt_package->value("calibrate_offset", 0);
+
+    std::string shelf_name_str = mqtt_package->value("smart_shelf_1_name", "");
+    sdata.s1_mpn = strdup(shelf_name_str.c_str());
+    sdata.s1_qty = mqtt_package->value("calibrate_scalar", 0.0);
+    sdata.s1_weight_per_item = mqtt_package->value("weight_item_1", 0.0);
+    sdata.s1_qty_limit = mqtt_package->value("limit_1", 0);
+    
+    shelf_name_str = mqtt_package->value("smart_shelf_2_name", "");
+    sdata.s2_mpn = strdup(shelf_name_str.c_str());
+    sdata.s2_qty = mqtt_package->value("calibrate_scalar", 0.0);
+    sdata.s2_weight_per_item = mqtt_package->value("weight_item_2", 0.0);
+    sdata.s2_qty_limit = mqtt_package->value("limit_2", 0);
+
+    shelf_name_str = mqtt_package->value("smart_shelf_3_name", "");
+    sdata.s3_mpn = strdup(shelf_name_str.c_str());
+    sdata.s3_qty = mqtt_package->value("calibrate_scalar", 0.0);
+    sdata.s3_weight_per_item = mqtt_package->value("weight_item_3", 0.0);
+    sdata.s3_qty_limit = mqtt_package->value("limit_3", 0);
+
+    sdata.total_weight = 1000;
+    
+    Common::set_shelf_data(sdata);
+    if (!Common::get_shelf_data_initialized())
+    {
+        Common::set_shelf_data_initialized(true);
+    }
+}
+
 static void mqtt_event_cb(MQTTContext_t* pMQTTContext,MQTTPacketInfo_t* pPacketInfo, MQTTDeserializedInfo_t* pDeserializedInfo)
 {
     ESP_LOGI(TAG,"MQTT CALL BACK EVENT: Packet info: %d", pPacketInfo->type);
@@ -163,7 +186,8 @@ static void mqtt_event_cb(MQTTContext_t* pMQTTContext,MQTTPacketInfo_t* pPacketI
    {
     case MQTT_PACKET_TYPE_PUBLISH : //Message received
         ESP_LOGI(TAG,"MQTT_PACKET_TYPE_PUBLISH");
-        ESP_LOGI(TAG,"received :\n%s",(const char*)(pDeserializedInfo->pPublishInfo->pPayload));        
+        ESP_LOGI(TAG,"received :\n%s",(const char*)(pDeserializedInfo->pPublishInfo->pPayload));
+        mqtt_decode_recieved((const json*)(pDeserializedInfo->pPublishInfo->pPayload));        
         break;
     case MQTT_PACKET_TYPE_SUBSCRIBE :
         ESP_LOGI(TAG,"MQTT_PACKET_TYPE_SUBSCRIBE");
@@ -187,6 +211,7 @@ void mqtt_process_task()
         ESP_LOGI(TAG,"mqtt_process_task started");
         mqtt_subscribe_to(&mqtt_context,topic_pub,MQTTQoS0);
         mqtt_subscribe_to(&mqtt_context,topic_sub,MQTTQoS0);
+        connect_message = true;
         mqtt_task_started = true;
     }
 
@@ -194,42 +219,62 @@ void mqtt_process_task()
     {
         MQTT_ProcessLoop(&mqtt_context);
         std::stringstream ss_mqtt;
-
-        json message_json = {
-            {"smart_shelf_id", "smart_shelf_1"},
-            {"shelves", {
-                {
-                    {"shelf_id", shelf_1.shelf_id},
-                    {"name", shelf_1.name},
-                    {"weight", shelf_1.weight},
-                    {"weight_of_one_item", shelf_1.weight_of_one_item},
-                    {"items", shelf_1.items},
-                    {"limit", shelf_1.limit}
-                },
-                {
-                    {"shelf_id", shelf_2.shelf_id},
-                    {"name", shelf_2.name},
-                    {"weight", shelf_2.weight},
-                    {"weight_of_one_item", shelf_2.weight_of_one_item},
-                    {"items", shelf_2.items},
-                    {"limit", shelf_2.limit}
-                },
-                {
-                    {"shelf_id", shelf_3.shelf_id},
-                    {"name", shelf_3.name},
-                    {"weight", shelf_3.weight},
-                    {"weight_of_one_item", shelf_3.weight_of_one_item},
-                    {"items", shelf_3.items},
-                    {"limit", shelf_3.limit}
-                }
-            }}
-        };
-        
-        std::string mqtt_string = message_json.dump();
-        publish_info.pPayload = mqtt_string.c_str();
-        publish_info.payloadLength = mqtt_string.length();
-        uint16_t packet_id = MQTT_GetPacketId(&mqtt_context);
-        MQTT_Publish(&mqtt_context,&publish_info,packet_id);
+        json message_json;
+        if (connect_message)
+        {
+            message_json = {
+                {"smart_shelf_id", "smart_shelf_1"},
+                {"startup", true}
+            };
+            std::string mqtt_string = message_json.dump();
+            publish_info.pPayload = mqtt_string.c_str();
+            publish_info.payloadLength = mqtt_string.length();
+            uint16_t packet_id = MQTT_GetPacketId(&mqtt_context);
+            MQTT_Publish(&mqtt_context,&publish_info,packet_id);
+            connect_message = false;
+        }
+        else if (Common::get_shelf_data_updated())
+        {
+            ShelfData sdata = Common::get_shelf_data();
+            message_json = {
+                {"smart_shelf_id", "smart_shelf_1"},
+                {"calibrate_offset", sdata.calib_offset},
+                {"calibrate_scalar", sdata.calib_scalar},
+                {"shelves", {
+                    {
+                        {"shelf_id", 1},
+                        {"name", sdata.s1_mpn},
+                        {"weight", sdata.s1_qty*sdata.s1_weight_per_item},
+                        {"weight_of_one_item", sdata.s1_weight_per_item},
+                        {"items", sdata.s1_qty},
+                        {"limit", sdata.s1_qty_limit}
+                    },
+                    {
+                        {"shelf_id", 2},
+                        {"name", sdata.s2_mpn},
+                        {"weight", sdata.s2_qty*sdata.s2_weight_per_item},
+                        {"weight_of_one_item", sdata.s2_weight_per_item},
+                        {"items", sdata.s2_qty},
+                        {"limit", sdata.s2_qty_limit}
+                    },
+                    {
+                        {"shelf_id", 3},
+                        {"name", sdata.s3_mpn},
+                        {"weight", sdata.s3_qty*sdata.s3_weight_per_item},
+                        {"weight_of_one_item", sdata.s3_weight_per_item},
+                        {"items", sdata.s3_qty},
+                        {"limit", sdata.s3_qty_limit}
+                    }
+                }}
+            };
+            std::string mqtt_string = message_json.dump();
+            publish_info.pPayload = mqtt_string.c_str();
+            publish_info.payloadLength = mqtt_string.length();
+            uint16_t packet_id = MQTT_GetPacketId(&mqtt_context);
+            MQTT_Publish(&mqtt_context,&publish_info,packet_id);
+            connect_message = false;
+            Common::set_shelf_data_updated(false);
+        }
     }
 }
 void set_wifi_status(bool connected)
@@ -248,8 +293,8 @@ void set_wifi_status(bool connected)
 
     //ESP_LOGI(TAG,"MQTT Connect err : %d",MQTT_Connect(&mqtt_context,&connect_info,NULL,1000,&ses_present));
     ESP_LOGI(TAG,"MQTT Connect err : %d",MQTT_Connect(&mqtt_context,&connect_info,NULL,2000,&ses_present));
-    mqtt_connected = true;//xTaskCreate(mqtt_process_task,"mqtt_process_task", 2048 * 2,NULL,5,&mqtt_task_handle);
-   // connected_to_aws = MQTT_Connect(&mqtt_context,&connect_info,NULL,2000,&ses_present);  
+    Common::set_connected(true);
+    //xTaskCreate(mqtt_process_task,"mqtt_process_task", 2048 * 2,NULL,5,&mqtt_task_handle);
 }
 static void event_handler(void* arg, esp_event_base_t event_base,
                                     int32_t event_id, void* event_data)
@@ -263,8 +308,8 @@ static void event_handler(void* arg, esp_event_base_t event_base,
          ESP_LOGI(TAG,"STA CONNECTED");
         ip_event_got_ip_t* event = (ip_event_got_ip_t*) event_data;
         ESP_LOGI(TAG, "got ip:" IPSTR, IP2STR(&event->ip_info.ip));
+        Common::set_wifi_connected(true);
         set_wifi_status(true);
-     
     }
     else if(event_base == WIFI_EVENT && event_id == WIFI_EVENT_STA_DISCONNECTED)
     {
@@ -357,15 +402,9 @@ void message_start()
 
 void message_loop()
 {
-    bool _state;
-    //printf("Message loop\n");
-    //xQueueReceive(mqtt_aws_queue,&(_state),portMAX_DELAY);
-
     mqtt_process_task();
 }
 
-ShelfData sdata;
-bool sent = false;
 #include "esp_timer.h"
 
 inline uint32_t millis()
@@ -390,7 +429,7 @@ void message_task(void *arg)
 
     while (1)
     {
-        if (mqtt_connected)
+        if (Common::get_connected())
         {
             static bool first = false;
             if(!first)
@@ -403,28 +442,5 @@ void message_task(void *arg)
         }
        
         vTaskDelay(pdMS_TO_TICKS(MESSAGE_LOOP_TIME_MS));
-    }
-    if (mqtt_connected) 
-    {
-        Common::set_connected(true);
-        float weight_scaler = 0.095;
-        int32_t weight_offset = 8600;
-        sdata.calib_scalar = weight_scaler;
-        sdata.calib_offset = weight_offset;
-        sdata.s1_mpn = shelf_1.name;
-        sdata.s1_qty = shelf_1.items;
-        sdata.s1_weight_per_item = shelf_1.weight_of_one_item;
-        sdata.s1_qty_limit = shelf_1.limit;
-    
-        sdata.s2_mpn = shelf_2.name;
-        sdata.s2_qty = shelf_2.items;
-        sdata.s2_weight_per_item = shelf_2.weight_of_one_item;
-        sdata.s2_qty_limit = shelf_2.limit;
-
-        sdata.total_weight = 1000;
-    
-        Common::set_shelf_data(sdata);
-        Common::set_shelf_data_initialized(true);
-        sent = true;
     }
 }

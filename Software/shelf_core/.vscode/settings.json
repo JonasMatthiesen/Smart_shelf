@@ -13,6 +13,13 @@
         "ranges": "cpp",
         "span": "cpp",
         "chrono": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "text_encoding": "cpp",
+        "typeinfo": "cpp",
+        "*.tcc": "cpp",
+        "optional": "cpp",
+        "format": "cpp",
+        "system_error": "cpp",
+        "regex": "cpp"
     }
 }
