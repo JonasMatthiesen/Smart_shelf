@@ -11,12 +11,12 @@ enum class ShelfCommands
 struct ShelfData
 {
     char * s1_mpn;
-    char * s1_qty;
+    int s1_qty;
     float s1_weight_per_item;
     int s1_qty_limit;
 
     char * s2_mpn;
-    char * s2_qty;
+    int s2_qty;
     float s2_weight_per_item;
     int s2_qty_limit;
 

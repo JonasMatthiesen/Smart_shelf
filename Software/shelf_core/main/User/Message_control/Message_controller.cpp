@@ -404,22 +404,22 @@ void message_task(void *arg)
        
         vTaskDelay(pdMS_TO_TICKS(MESSAGE_LOOP_TIME_MS));
     }
-    if (elapsed_since(0) >= 5000 && !sent) 
+    if (mqtt_connected) 
     {
         Common::set_connected(true);
         float weight_scaler = 0.095;
         int32_t weight_offset = 8600;
         sdata.calib_scalar = weight_scaler;
         sdata.calib_offset = weight_offset;
-        sdata.s1_mpn = "Screw";
-        sdata.s1_qty = "22";
-        sdata.s1_weight_per_item = 50;
-        sdata.s1_qty_limit = 100;
+        sdata.s1_mpn = shelf_1.name;
+        sdata.s1_qty = shelf_1.items;
+        sdata.s1_weight_per_item = shelf_1.weight_of_one_item;
+        sdata.s1_qty_limit = shelf_1.limit;
     
-        sdata.s2_mpn = "Bolt";
-        sdata.s2_qty = "55";
-        sdata.s2_weight_per_item = 100;
-        sdata.s2_qty_limit = 100;
+        sdata.s2_mpn = shelf_2.name;
+        sdata.s2_qty = shelf_2.items;
+        sdata.s2_weight_per_item = shelf_2.weight_of_one_item;
+        sdata.s2_qty_limit = shelf_2.limit;
 
         sdata.total_weight = 1000;
     
