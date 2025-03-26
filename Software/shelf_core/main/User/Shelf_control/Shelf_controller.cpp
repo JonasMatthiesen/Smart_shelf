@@ -15,7 +15,7 @@
 
 static const char *TAG = "SHLF_CTRL";
 const uint16_t SHELF_LOOP_TIME_MS = 300;
-const uint16_t CONNECTION_TIMEOUT = 20000;
+const uint16_t CONNECTION_TIMEOUT = 60000;
 
 uint32_t last_time = 0;
 
@@ -118,7 +118,7 @@ float get_current_weight()
     //ESP_LOGI(TAG, "Raw weight: %li \n", data);
     float weight = (data-shelf_data.calib_offset)*shelf_data.calib_scalar;
     //ESP_LOGI(TAG, "Scaled weight: %f \n", weight);
-    return weight*(-1);
+    return weight;
 }
 
 //This function checks if the wifi is provisioned, and if the message controller is connected to AWS. It will wait CONNECTION_TIMEOUT time for each check
@@ -251,19 +251,11 @@ void shelf_start()
     else
     {
         //Sanity check to see if weight is correct compared to server value
-        float current_weight = get_current_weight();
+        float current_vweight = get_current_weight();
+        ESP_LOGI(TAG, "Weight: %f" PRIi32, current_vweight);
 
-        if (current_weight < shelf_data.total_weight - 100 || current_weight > shelf_data.total_weight + 100)
-        {
-            //Display error message on screen
-            Display::set_bootup_message("Weight is not as expected");
-            ESP_LOGE(TAG, "Weight is not as expected, please check the shelf" PRIi32);
-        }
-        else
-        {
-            Display::load_main_screen();
-            Common::set_init_complete(true);
-        }
+        Display::load_main_screen();
+        Common::set_init_complete(true);
     }
 }
 
@@ -321,9 +313,17 @@ void shelf_loop()
             float new_qty = weight_diff / shelf_data.s1_weight_per_item;
 
             ESP_LOGI(TAG, "Weight diff: %f" PRIi32, weight_diff);
-            ESP_LOGI(TAG, "New qty: %f" PRIi32, round(new_qty));
+            ESP_LOGI(TAG, "New qty: %f" PRIi32, floor(new_qty));
 
-            shelf_data.s1_qty += round(new_qty);
+            if(floor(new_qty) +  shelf_data.s1_qty < 0)
+            {
+                shelf_data.s1_qty = 0;
+            } 
+            else
+            {
+                shelf_data.s1_qty += floor(new_qty);
+            }
+
             shelf_data.total_weight = new_weight;
             
             Display::set_shelf_data(Display::ActiveShelf::SHELF_1, shelf_data.s1_mpn, shelf_data.s1_qty);
@@ -332,7 +332,7 @@ void shelf_loop()
 
             Display::set_active_shelf(Display::ActiveShelf::NONE);
         }
-        else if (s2_active)
+        else if (!s2_active)
         {
                 Display::set_active_shelf(Display::ActiveShelf::SHELF_2);
                 float prev_weight = get_current_weight();
@@ -351,9 +351,16 @@ void shelf_loop()
                 float new_qty = weight_diff / shelf_data.s2_weight_per_item;
     
                 ESP_LOGI(TAG, "Weight diff: %f" PRIi32, weight_diff);
-                ESP_LOGI(TAG, "New qty: %f" PRIi32, round(new_qty));
-    
-                shelf_data.s2_qty += round(new_qty);
+                ESP_LOGI(TAG, "New qty: %f" PRIi32, floor(new_qty));
+
+                if(floor(new_qty) +  shelf_data.s2_qty < 0)
+                {
+                    shelf_data.s2_qty = 0;
+                } 
+                else
+                {
+                    shelf_data.s2_qty += floor(new_qty);
+                }
                 shelf_data.total_weight = new_weight;
                 
                 Display::set_shelf_data(Display::ActiveShelf::SHELF_2, shelf_data.s2_mpn, shelf_data.s2_qty);
@@ -381,9 +388,16 @@ void shelf_loop()
             float new_qty = weight_diff / shelf_data.s3_weight_per_item;
 
             ESP_LOGI(TAG, "Weight diff: %f" PRIi32, weight_diff);
-            ESP_LOGI(TAG, "New qty: %f" PRIi32, round(new_qty));
+            ESP_LOGI(TAG, "New qty: %f" PRIi32, floor(new_qty));
 
-            shelf_data.s3_qty += round(new_qty);
+            if(floor(new_qty) +  shelf_data.s3_qty < 0)
+            {
+                shelf_data.s3_qty = 0;
+            } 
+            else
+            {
+                shelf_data.s3_qty += floor(new_qty);
+            }
             shelf_data.total_weight = new_weight;
             
             Display::set_shelf_data(Display::ActiveShelf::SHELF_3, shelf_data.s3_mpn, shelf_data.s3_qty);

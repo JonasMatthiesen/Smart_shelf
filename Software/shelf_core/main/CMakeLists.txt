@@ -12,5 +12,5 @@ set(srcs "main.cpp"
 idf_component_register(SRCS ${srcs} 
                     PRIV_REQUIRES spi_flash
                     INCLUDE_DIRS ""
-                    REQUIRES nvs_flash esp_wifi espressif__qrcode coreMQTT coreMQTT-Agent driver
+                    REQUIRES nvs_flash esp_wifi coreMQTT coreMQTT-Agent driver
                     wifi_provisioning)

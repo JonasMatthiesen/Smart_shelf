@@ -2,11 +2,11 @@
 #include "esp_log.h"
 
 ShelfData data;
-bool server_connected = true;
-bool wifi_connected = true;
-bool wifi_provisioned = true;
+bool server_connected = false;
+bool wifi_connected = false;
+bool wifi_provisioned = false;
 bool init_complete = false;
-bool shelf_data_initialized = true;
+bool shelf_data_initialized = false;
 bool shelf_data_updated = false;
 
 void Common::set_shelf_data(ShelfData _data)
@@ -16,7 +16,7 @@ void Common::set_shelf_data(ShelfData _data)
 
 ShelfData Common::get_shelf_data()
 {
-    float weight_scaler = 0.10025;
+/*     float weight_scaler = 0.10025;
     int32_t weight_offset = -3649;
     data.calib_scalar = weight_scaler;
     data.calib_offset = weight_offset;
@@ -36,7 +36,7 @@ ShelfData Common::get_shelf_data()
     data.s3_weight_per_item = 20;
     data.s3_qty_limit = 100;
 
-    data.total_weight = 0;
+    data.total_weight = 0; */
     return data;
 }
 
